@@ -1,3 +1,4 @@
+#!usr/bin/env python
 #-*- coding:utf-8 -*-
 
 
@@ -261,7 +262,7 @@ def main(stdscr):
     state = 'Init'
     #状态机开始循环
     while state != 'Exit':
-        state = state_actions(state)()
+        state = state_actions[state]()
 
 
 
