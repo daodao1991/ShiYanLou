@@ -5,7 +5,7 @@
 import curses
 from random import randrange, choice
 from collections import defaultdict
-#from QiPan import GameField
+
 
 
 
@@ -26,7 +26,7 @@ def get_user_action(keyboard):
 def invert(field):
     """矩阵的逆转，但不是逆矩阵"""
     #相当于矩阵的左右调换了一下
-    return row[::-1] for row in field
+    return [row[::-1] for row in field]
 
 
     #矩阵的转置！！！！
@@ -117,9 +117,9 @@ class GameField(object):
         draw_line()
         
         if self.is_win():
-            screen.addstr('          YOU WIN!')
+            screen.addstr('          YOU WIN!'+'\n')
         elif self.is_gameover():
-            screen.addstr('          GAME OVER!')
+            screen.addstr('          GAME OVER!'+'\n')
         else:
             screen.addstr('(W)Up (S)Down (A)Left (D)Right'+'\n')
         screen.addstr('     (R)Restart (Q)Exit')   
@@ -168,7 +168,7 @@ class GameField(object):
 
         moves = {}
         moves['Left']  = lambda field_1: [move_row_left(row) for row in field_1]
-        moves['Right'] = lambda field_2: invert(moves['left'](invert(field_2)))
+        moves['Right'] = lambda field_2: invert(moves['Left'](invert(field_2)))
         
         #上、下这两个动作很巧妙地使用了矩阵的转置
         moves['Up']    = lambda field_3: transpose(moves['Left'](transpose(field_3)))
@@ -197,10 +197,10 @@ class GameField(object):
             return any(change(i) for i in range(len(row)-1))
 
         check = {}
-        check['Left'] = lambda field_1: any(row_left_is_movable(row) for row in self.field)
+        check['Left'] = lambda field_1: any(row_left_is_movable(row) for row in field_1)
         check['Right'] = lambda field_2: check['Left'](invert(field_2))
         check['Up'] = lambda field_3: check['Left'](transpose(field_3))
-        check['Down'] = lambda field_4: check['Right'](tranpose(field_4))
+        check['Down'] = lambda field_4: check['Right'](transpose(field_4))
 
         if direction in check:
             return check[direction](self.field)
@@ -209,7 +209,9 @@ class GameField(object):
  
 
 
-        
+
+                       
+                    
 def main(stdscr):
     def init():
         game_field.reset()
@@ -243,6 +245,12 @@ def main(stdscr):
             return 'Init'
         if action == 'Exit':
             return 'Exit'
+
+	if game_field.move(action):  #成功地进行了移动
+	    if game_field.is_win():
+		return 'Win'
+	    if game_field.is_gameover():
+		return 'Gameover'
 
         return 'Game'
 
